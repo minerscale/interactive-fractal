@@ -57,6 +57,24 @@ impl FractalComputePipeline {
             [0.0, 1.0, 1.0, 1.0],
             [0.0, 0.0, 1.0, 1.0],
             [1.0, 0.0, 1.0, 1.0],
+            [1.0, 0.0, 0.0, 1.0],
+            [1.0, 1.0, 0.0, 1.0],
+            [0.0, 1.0, 0.0, 1.0],
+            [0.0, 1.0, 1.0, 1.0],
+            [0.0, 0.0, 1.0, 1.0],
+            [1.0, 0.0, 1.0, 1.0],
+            [1.0, 0.0, 0.0, 1.0],
+            [1.0, 1.0, 0.0, 1.0],
+            [0.0, 1.0, 0.0, 1.0],
+            [0.0, 1.0, 1.0, 1.0],
+            [0.0, 0.0, 1.0, 1.0],
+            [1.0, 0.0, 1.0, 1.0],
+            [1.0, 0.0, 0.0, 1.0],
+            [1.0, 1.0, 0.0, 1.0],
+            [0.0, 1.0, 0.0, 1.0],
+            [0.0, 1.0, 1.0, 1.0],
+            [0.0, 0.0, 1.0, 1.0],
+            [1.0, 0.0, 1.0, 1.0],
         ];
         let palette_size = colors.len() as i32;
         let palette = CpuAccessibleBuffer::from_iter(
@@ -121,7 +139,7 @@ impl FractalComputePipeline {
         &self,
         image: DeviceImageView,
         c: Vector2<f32>,
-        scale: Vector2<f32>,
+        scale: ArbitraryFixed,
         translation: Vector2<ArbitraryFixed>,
         max_iters: u32,
         is_julia: bool,
@@ -148,7 +166,7 @@ impl FractalComputePipeline {
 
         let push_constants = cs::ty::PushConstants {
             c: c.into(),
-            scale: scale.into(),
+            scale: scale.data,
             translation_x: translation.x.data,
             translation_y: translation.y.data,
             //translation: translation.into(),
@@ -156,7 +174,7 @@ impl FractalComputePipeline {
             palette_size: self.palette_size,
             max_iters: max_iters as i32,
             is_julia: is_julia as u32,
-            //_dummy0: [0u8; 8], // Required for alignment
+            _dummy0: [0u8; 8], // Required for alignment
         };
         builder
             .bind_pipeline_compute(self.pipeline.clone())

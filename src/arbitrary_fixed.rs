@@ -7,8 +7,8 @@ use std::{ops::{Add, Mul, Neg, Sub, AddAssign, MulAssign, SubAssign, Div, DivAss
 use bytemuck::{Pod, Zeroable};
 use cgmath::{Zero, One, num_traits::{NumCast, ToPrimitive, Num}};
 
-const SIZE: usize = 6;
-const SCALING_FACTOR: usize = 128;
+const SIZE: usize = 4;
+const SCALING_FACTOR: usize = 96;
 
 #[derive(Debug, Copy, Clone, Default, PartialEq, Eq, Ord, Pod, Zeroable)]
 #[repr(C)]
@@ -125,36 +125,35 @@ impl Div for ArbitraryFixed {
         let mut rem: [u32; SIZE * 2] = Default::default();
         let mut d: [u32; SIZE * 2] = Default::default();
         let mut res: [u32; SIZE * 2] = Default::default();
-        for i in 0..(SIZE * 2) {
+        for i in 0..SIZE {
             rem[i] = fix_a.data[i];
             d[i + SIZE] = fix_b.data[i];
         }
 
         for _ in (0..(2 * 32 * SIZE)).rev() {
             res = ArbitraryFixed::lshift1_double(res);
-
             
             let rem_d = {
                 let mut d_sub: [u32; 2 * SIZE] = Default::default();
                 let mut carry_prev = true;
                 for (r, a) in d_sub.iter_mut().zip(d.iter()) {
                     *r = !a;
-                    *r += carry_prev as u32;
+                    *r = (*r).wrapping_add(carry_prev as u32);
                     carry_prev = carry_prev && (*r == 0);
                 }
 
                 let mut ret: [u32; 2 * SIZE] = Default::default();
                 let mut carry_prev = false;
                 for ((r, a), b) in ret.iter_mut().zip(rem).zip(d_sub) {
-                    *r = a + b;
+                    *r = a.wrapping_add(b);
                     let carry = *r < a;
-                    *r += carry_prev as u32;
+                    *r = (*r).wrapping_add(carry_prev as u32);
                     carry_prev = carry || (carry_prev && (*r == 0));
                 }
 
                 ret
             };
-            if rem_d[2 * SIZE - 1] & 0x80000000 == 0 {
+            if (rem_d[2 * SIZE - 1] & 0x80000000) == 0 {
                 res[0] |= 1;
                 rem = rem_d;
             }
@@ -165,7 +164,7 @@ impl Div for ArbitraryFixed {
         let mut r: ArbitraryFixed = Default::default();
         for idx in 0..SIZE {
             r.data[idx] = (if (SCALING_FACTOR % 32) > 0 {
-                res[idx + SIZE - 1 - (SCALING_FACTOR / 32)] >> ((-(SCALING_FACTOR as isize)) % 32)
+                res[idx + SIZE - 1 - (SCALING_FACTOR / 32)] >> (((32 as usize).wrapping_sub(SCALING_FACTOR) % 32))
             } else {
                 0
             }) | ((res[idx + SIZE - (SCALING_FACTOR / 32)]) << (SCALING_FACTOR % 32));

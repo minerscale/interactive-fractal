@@ -10,7 +10,7 @@
 use crate::arbitrary_fixed::ArbitraryFixed;
 use crate::fractal_compute_pipeline::FractalComputePipeline;
 use crate::place_over_frame::RenderPassPlaceOverFrame;
-use cgmath::Vector2;
+use cgmath::{Vector2, Zero};
 use std::sync::Arc;
 use std::time::Instant;
 use vulkano::command_buffer::allocator::StandardCommandBufferAllocator;
@@ -45,7 +45,7 @@ pub struct FractalApp {
     /// C is a constant input to Julia escape time algorithm (mouse position).
     c: Vector2<f32>,
     /// Our zoom level
-    scale: Vector2<f32>,
+    scale: ArbitraryFixed,
     /// Our translation on the complex plane
     translation: Vector2<ArbitraryFixed>,
     /// How far should the escape time algorithm run (higher = less performance, more accurate image)
@@ -90,7 +90,7 @@ impl FractalApp {
             is_julia: false,
             is_c_paused: false,
             c: Vector2::new(0.0, 0.0),
-            scale: Vector2::new(4.0, 4.0),
+            scale: 4.0.into(),
             translation: Vector2::new(0.0.into(), 0.0.into()),
             max_iters: MAX_ITERS_INIT,
             time: Instant::now(),
@@ -163,24 +163,24 @@ Usage:
     pub fn update_state_after_inputs(&mut self, renderer: &mut VulkanoWindowRenderer) {
         // Zoom in or out
         if self.input_state.scroll_delta > 0. {
-            self.scale /= 1.1;
+            self.scale *= (1.0/1.2).into();
         } else if self.input_state.scroll_delta < 0. {
-            self.scale *= 1.1;
+            self.scale *= 1.2.into();
         }
         // Move speed scaled by zoom level
-        let move_speed: ArbitraryFixed = ArbitraryFixed::from(MOVE_SPEED * self.dt) * ArbitraryFixed::from(self.scale.x);
+        let move_speed: ArbitraryFixed = ArbitraryFixed::from(MOVE_SPEED * self.dt) * self.scale;
         // Panning
         if self.input_state.pan_up {
-            self.translation += Vector2::new(0.0.into(), move_speed);
+            self.translation += Vector2::new(ArbitraryFixed::zero(), move_speed);
         }
         if self.input_state.pan_down {
-            self.translation += Vector2::new(0.0.into(), -move_speed);
+            self.translation += Vector2::new(ArbitraryFixed::zero(), -move_speed);
         }
         if self.input_state.pan_right {
-            self.translation += Vector2::new(move_speed, 0.0.into());
+            self.translation += Vector2::new(move_speed, ArbitraryFixed::zero());
         }
         if self.input_state.pan_left {
-            self.translation += Vector2::new(-move_speed, 0.0.into());
+            self.translation += Vector2::new(-move_speed, ArbitraryFixed::zero());
         }
         // Toggle between julia and mandelbrot
         if self.input_state.toggle_julia {
@@ -195,7 +195,7 @@ Usage:
             // Scale normalized mouse pos between -1.0 and 1.0;
             let mouse_pos = self.input_state.normalized_mouse_pos() * 2.0 - Vector2::new(1.0, 1.0);
             // Scale by our zoom (scale) level so when zooming in the movement on julia is not so drastic
-            self.c = mouse_pos * self.scale.x;
+            self.c = mouse_pos * self.scale.into();
         }
         // Update how many iterations we have
         if self.input_state.increase_iterations {
