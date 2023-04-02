@@ -7,8 +7,8 @@ use std::{ops::{Add, Mul, Neg, Sub, AddAssign, MulAssign, SubAssign, Div, DivAss
 use bytemuck::{Pod, Zeroable};
 use cgmath::{Zero, One, num_traits::{NumCast, ToPrimitive, Num}};
 
-const SIZE: usize = 4;
-const SCALING_FACTOR: usize = 96;
+const SIZE: usize = 8;
+const SCALING_FACTOR: usize = 32 * (SIZE - 1);
 
 #[derive(Debug, Copy, Clone, Default, PartialEq, Eq, Ord, Pod, Zeroable)]
 #[repr(C)]

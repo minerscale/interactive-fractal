@@ -2,7 +2,7 @@
 
 #include "arbitraryfixed.glsl"
 
-#define SSAA_SAMPLES 2
+#define SSAA_SAMPLES 1
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 

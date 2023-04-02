@@ -189,7 +189,6 @@ impl FractalComputePipeline {
 }
 
 mod cs {
-    
     vulkano_shaders::shader! {
         ty: "compute",
         path: "src/fractal.glsl",

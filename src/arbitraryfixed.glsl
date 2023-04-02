@@ -1,10 +1,10 @@
 #extension GL_EXT_shader_explicit_arithmetic_types_int64: enable
 
 /* integers per arbitrary-precision number */
-#define SIZE 4
+#define SIZE 8
 
 /* Scaling Factor as a power of 2 */
-const uint scaling_factor = 96;
+const uint scaling_factor = 32 * (SIZE - 1);
 
 /* !TODO! */
 /* Consider avoiding the use of uint64_t in favour of a better rollover detection */
