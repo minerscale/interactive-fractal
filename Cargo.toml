@@ -18,10 +18,8 @@ rand = "0.8.5"
 bytemuck = "1.13.1"
 vulkano-shaders = "0.32.0"
 wrapping_arithmetic = "0.1.0"
-arbitrary_fixed = { path = "arbitrary_fixed" }
-
-[workspace]
-members = ["arbitrary_fixed"]
+arbitrary-fixed = { git = "https://github.com/minerscale/arbitrary-fixed-rs" }
 
 [build-dependencies]
-arbitrary_fixed = { path = "arbitrary_fixed" }
+arbitrary-fixed = { git = "https://github.com/minerscale/arbitrary-fixed-rs" }
+arbitrary-fixed-glsl = { git = "https://github.com/minerscale/arbitrary-fixed-glsl" }

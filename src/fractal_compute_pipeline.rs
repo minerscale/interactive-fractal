@@ -170,14 +170,4 @@ impl FractalComputePipeline {
     }
 }
 
-mod cs {
-    vulkano_shaders::shader! {
-        ty: "compute",
-        path: "src/fractal.glsl",
-        types_meta: {
-            use bytemuck::{Pod, Zeroable};
-
-            #[derive(Clone, Copy, Zeroable, Pod)]
-        },
-    }
-}
+include!(concat!(env!("OUT_DIR"), "/cs.rs"));

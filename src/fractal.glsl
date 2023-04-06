@@ -1,6 +1,7 @@
 #version 450
 
-#include "arbitrary_fixed_glsl/arbitraryfixed.glsl"
+#include <arbitraryfixed.glsl>
+#include "local_consts.glsl"
 
 #define SSAA_SAMPLES 2
 
