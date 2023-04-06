@@ -25,7 +25,6 @@ mod app;
 mod fractal_compute_pipeline;
 mod pixels_draw_pipeline;
 mod place_over_frame;
-mod arbitrary_fixed;
 
 /// This is an example demonstrating an application with some more non-trivial functionality.
 /// It should get you more up to speed with how you can use Vulkano.
@@ -39,7 +38,7 @@ mod arbitrary_fixed;
 fn main() {
     // Create event loop
     let mut event_loop = EventLoop::new();
-    let context = VulkanoContext::new(VulkanoConfig{
+    let context = VulkanoContext::new(VulkanoConfig {
         device_features: Features {
             shader_int64: true,
             ..Default::default()

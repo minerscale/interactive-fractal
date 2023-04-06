@@ -18,3 +18,10 @@ rand = "0.8.5"
 bytemuck = "1.13.1"
 vulkano-shaders = "0.32.0"
 wrapping_arithmetic = "0.1.0"
+arbitrary_fixed = { path = "arbitrary_fixed" }
+
+[workspace]
+members = ["arbitrary_fixed"]
+
+[build-dependencies]
+arbitrary_fixed = { path = "arbitrary_fixed" }

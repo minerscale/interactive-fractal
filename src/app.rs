@@ -7,10 +7,10 @@
 // notice may not be copied, modified, or distributed except
 // according to those terms.
 
-use crate::arbitrary_fixed::ArbitraryFixed;
 use crate::fractal_compute_pipeline::FractalComputePipeline;
 use crate::place_over_frame::RenderPassPlaceOverFrame;
-use cgmath::{Vector2, Zero};
+use arbitrary_fixed::ArbitraryFixed;
+use cgmath::Vector2;
 use std::sync::Arc;
 use std::time::Instant;
 use vulkano::command_buffer::allocator::StandardCommandBufferAllocator;
@@ -90,8 +90,8 @@ impl FractalApp {
             is_julia: false,
             is_c_paused: false,
             c: Vector2::new(0.0, 0.0),
-            scale: 4.0.into(),
-            translation: Vector2::new(0.0.into(), 0.0.into()),
+            scale: 4u32.into(),
+            translation: Vector2::new(0u32.into(), 0u32.into()),
             max_iters: MAX_ITERS_INIT,
             time: Instant::now(),
             dt: 0.0,
@@ -163,7 +163,7 @@ Usage:
     pub fn update_state_after_inputs(&mut self, renderer: &mut VulkanoWindowRenderer) {
         // Zoom in or out
         if self.input_state.scroll_delta > 0. {
-            self.scale *= (1.0/1.2).into();
+            self.scale /= 1.2.into();
         } else if self.input_state.scroll_delta < 0. {
             self.scale *= 1.2.into();
         }
@@ -171,16 +171,16 @@ Usage:
         let move_speed: ArbitraryFixed = ArbitraryFixed::from(MOVE_SPEED * self.dt) * self.scale;
         // Panning
         if self.input_state.pan_up {
-            self.translation += Vector2::new(ArbitraryFixed::zero(), move_speed);
+            self.translation += Vector2::new(0u32.into(), move_speed);
         }
         if self.input_state.pan_down {
-            self.translation += Vector2::new(ArbitraryFixed::zero(), -move_speed);
+            self.translation += Vector2::new(0u32.into(), -move_speed);
         }
         if self.input_state.pan_right {
-            self.translation += Vector2::new(move_speed, ArbitraryFixed::zero());
+            self.translation += Vector2::new(move_speed, 0u32.into());
         }
         if self.input_state.pan_left {
-            self.translation += Vector2::new(-move_speed, ArbitraryFixed::zero());
+            self.translation += Vector2::new(-move_speed, 0u32.into());
         }
         // Toggle between julia and mandelbrot
         if self.input_state.toggle_julia {
@@ -195,7 +195,7 @@ Usage:
             // Scale normalized mouse pos between -1.0 and 1.0;
             let mouse_pos = self.input_state.normalized_mouse_pos() * 2.0 - Vector2::new(1.0, 1.0);
             // Scale by our zoom (scale) level so when zooming in the movement on julia is not so drastic
-            self.c = mouse_pos * self.scale.into();
+            self.c = mouse_pos * f32::from(self.scale);
         }
         // Update how many iterations we have
         if self.input_state.increase_iterations {

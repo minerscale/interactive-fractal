@@ -27,7 +27,7 @@ use vulkano::{
 };
 use vulkano_util::renderer::DeviceImageView;
 
-use crate::arbitrary_fixed::ArbitraryFixed;
+use arbitrary_fixed::ArbitraryFixed;
 
 //use crate::arbitrary_fixed::ArbitraryFixed;
 
@@ -51,24 +51,6 @@ impl FractalComputePipeline {
     ) -> FractalComputePipeline {
         // Initial colors
         let colors = vec![
-            [1.0, 0.0, 0.0, 1.0],
-            [1.0, 1.0, 0.0, 1.0],
-            [0.0, 1.0, 0.0, 1.0],
-            [0.0, 1.0, 1.0, 1.0],
-            [0.0, 0.0, 1.0, 1.0],
-            [1.0, 0.0, 1.0, 1.0],
-            [1.0, 0.0, 0.0, 1.0],
-            [1.0, 1.0, 0.0, 1.0],
-            [0.0, 1.0, 0.0, 1.0],
-            [0.0, 1.0, 1.0, 1.0],
-            [0.0, 0.0, 1.0, 1.0],
-            [1.0, 0.0, 1.0, 1.0],
-            [1.0, 0.0, 0.0, 1.0],
-            [1.0, 1.0, 0.0, 1.0],
-            [0.0, 1.0, 0.0, 1.0],
-            [0.0, 1.0, 1.0, 1.0],
-            [0.0, 0.0, 1.0, 1.0],
-            [1.0, 0.0, 1.0, 1.0],
             [1.0, 0.0, 0.0, 1.0],
             [1.0, 1.0, 0.0, 1.0],
             [0.0, 1.0, 0.0, 1.0],
