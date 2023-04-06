@@ -1,8 +1,8 @@
 #version 450
 
-#include "arbitraryfixed.glsl"
+#include "arbitrary_fixed_glsl/arbitraryfixed.glsl"
 
-#define SSAA_SAMPLES 1
+#define SSAA_SAMPLES 2
 
 layout(local_size_x = 8, local_size_y = 8, local_size_z = 1) in;
 
@@ -42,24 +42,26 @@ void main() {
     // Scale image pixels to range
     ivec2 dims = imageSize(img);
     uint ar[SIZE];
-    fix_from_float(ar, float(dims.x) / float(dims.y));
+    fix_from_uint(ar, dims.x);
+    fix_div_by_u32(ar, ar, dims.y);
 
     //float x_over_width = (gl_GlobalInvocationID.x / dims.x);
-    fix_from_float(tmp_0, float(gl_GlobalInvocationID.x) / float(dims.x));
-
+    fix_from_uint(tmp_0, gl_GlobalInvocationID.x);
+    fix_div_by_u32(tmp_0, tmp_0, dims.x);
     
     //float y_over_height = (gl_GlobalInvocationID.y / dims.y);
-    fix_from_float(tmp_1, float(gl_GlobalInvocationID.y) / float(dims.y));
+    fix_from_uint(tmp_1, gl_GlobalInvocationID.y);
+    fix_div_by_u32(tmp_1, tmp_1, dims.y);
 
     //float x0 = ar * (push_constants.translation.x + (x_over_width - 0.5) * push_constants.scale.x);
-    fix_from_float(tmp_2, -0.5);
-    fix_add(tmp_0, tmp_0, tmp_2);
+    //fix_from_float(tmp_2, -0.5);
+    fix_add(tmp_0, tmp_0, FIX_NEG_HALF);
     fix_mul(tmp_0, tmp_0, push_constants.scale);
     fix_add(tmp_0, tmp_0, push_constants.translation_x);
     fix_mul(px, tmp_0, ar);
 
     //float y0 = push_constants.translation.y + (y_over_height - 0.5) * push_constants.scale.y;
-    fix_add(tmp_1, tmp_1, tmp_2);
+    fix_add(tmp_1, tmp_1, FIX_NEG_HALF);
     fix_mul(tmp_1, tmp_1, push_constants.scale);
     fix_add(py, tmp_1, push_constants.translation_y);
 
@@ -67,9 +69,6 @@ void main() {
     // you'll see. Thus we want to bind the c to mouse position.
     // With mandelbrot, c = scaled xy position of the image. Z starts from zero.
     // With julia, c = any value between the interesting range (-2.0 - 2.0), Z = scaled xy position of the image.
-
-    uint escape_squared[SIZE];
-    fix_from_float(escape_squared, 64.0);
 
     uint px_mul[SIZE];
     fix_from_float(px_mul, 1.0/float(dims.y));
@@ -124,7 +123,7 @@ void main() {
             fix_add(tmp_0, tmp_1, tmp_1);
             fix_add(zy, tmp_0, cy);
     
-            fix_copy(zx, tmp_2);
+            zx = tmp_2;
     
             // len_z = length(z);
             fix_mul(tmp_0, zx, zx);
@@ -133,9 +132,9 @@ void main() {
             
             // Using 8.0 for bailout limit give a little nicer colors with smooth colors
             // 2.0 is enough to 'determine' an escape will happen
-            fix_sub(tmp_1, tmp_0, escape_squared);
+            fix_sub(tmp_1, tmp_0, FIX_SIXTY_FOUR);
             
-            if (!is_negative(tmp_1)) {
+            if (!fix_is_negative(tmp_1)) {
                 break;
             }
         }
